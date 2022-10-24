@@ -68,7 +68,7 @@ Introduction        {#intro}
 ============
 
 For the Concise Binary Object Representation, CBOR,
-{{Section 8 of -cbor}}
+{{Section 8 of -cbor}} in conjunction with {{Appendix G of -cddl}}
 [^abs1-]
 Diagnostic notation is based on JSON, with extensions
 for representing CBOR constructs such as binary data and tags.
