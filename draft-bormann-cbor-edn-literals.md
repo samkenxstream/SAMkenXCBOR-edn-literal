@@ -43,7 +43,7 @@ informative:
 
 --- abstract
 
-The Concise Binary Object Representation, CBOR (RFC 8949) [^abs1-]
+The Concise Binary Object Representation, CBOR (RFC 8949), [^abs1-]
 
 [^abs1-]: defines a "diagnostic notation" in order to
     be able to converse about CBOR data items without having to resort to
