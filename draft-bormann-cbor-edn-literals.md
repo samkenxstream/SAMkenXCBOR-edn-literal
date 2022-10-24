@@ -26,6 +26,9 @@ author:
     phone: +49-421-218-63921
     email: cabo@tzi.org
 
+venue:
+  mail: cbor@ietf.org
+  github: cabo/edn-literal
 
 normative:
   RFC8610: cddl
