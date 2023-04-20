@@ -5,7 +5,7 @@ title: >
   Application-Oriented Literals in CBOR Extended Diagnostic Notation
 abbrev: CBOR EDN Literals
 docname: draft-bormann-cbor-edn-literals-latest
-date: 2022-10-24
+date: 2023-03-29
 
 keyword: Internet-Draft
 cat: info
@@ -40,6 +40,7 @@ normative:
 informative:
   RFC4648: base
   I-D.ietf-core-coral: coral
+  IANA.core-parameters:
 
 --- abstract
 
@@ -54,13 +55,6 @@ The Concise Binary Object Representation, CBOR (RFC 8949), [^abs1-]
     CBOR diagnostic notation with CoRAL and Constrained Resource Identifiers
 
 ​[^abs3-] (draft-ietf-core-coral, draft-ietf-core-href).
-
-
---- to_be_removed_note_
-
-The content of this draft may preferably be
-distributed to a number of different documents.
-This is to be decided.
 
 --- middle
 
@@ -80,7 +74,11 @@ for representing CBOR constructs such as binary data and tags.
 
 [^abs3-] {{-coral}} {{-cri}}.
 
+[^cri-later]
 
+[^cri-later]: Note that the {{cri}} about CRIs may move to the {{-cri}}
+    specification, depending on the relative speed of approval; the
+    later document gets the section.
 
 Application-Oriented Extension Literals
 =======================================
@@ -108,7 +106,7 @@ lower-case ASCII letter (a-z) and zero or more additional ASCII
 characters that are either lower-case letters or digits (a-z0-9).
 
 Application-extension identifiers are registered in a registry
-({{sec-iana}}).
+({{appext-iana}}).
 Prefixing a single-quoted string, an application-extension identifier
 is used to build an application-oriented extension literal, which
 stands for a CBOR data item the value of which is derived from the
@@ -118,8 +116,13 @@ the specification for an application-extension identifier.
 Examples for application-oriented extensions to CBOR diagnostic
 notation can be found in the following sections.
 
+In addition, this document finally registers a media type identifier
+and a content-format for CBOR diagnostic notation.  This does not
+elevate its status as an interchange format, but recognizes that
+interaction between tools is often smoother if media types can be used.
 
-The "cri" Extension
+
+The "cri" Extension {#cri}
 ===================
 
 The application-extension identifier "cri" is used to notate a
@@ -148,7 +151,7 @@ is equivalent to
 ~~~
 
 
-The "dt" Extension
+The "dt" Extension {#dt}
 ==================
 
 The application-extension identifier "dt" is used to notate a
@@ -181,6 +184,8 @@ is equivalent to
 IANA Considerations {#sec-iana}
 ===================
 
+## CBOR Diagnostic Notation application extension identifiers registry {#appext-iana}
+
 IANA is requested to create a registry [[where?]] for
 application-extension identifiers, with the initial content shown in
 {{tab-iana}}.
@@ -198,9 +203,83 @@ identifier registry"}
 
 [^todo1]
 
-[^todo1]: (Define policy; detailed template)
+[^todo1]: (Define policy: probably specification required?; detailed template)
 
-Security considerations
+
+
+## Media Type
+
+IANA is requested to add the following Media-Type to the "Media Types"
+registry {{!IANA.media-types}}.
+
+| Name            | Template                    | Reference              |
+| cbor-diagnostic | application/cbor-diagnostic | RFC XXXX, {{media-type}} |
+{: #new-media-type align="left" title="New Media Type application/cbor-diagnostic"}
+
+{:compact}
+Type name:
+: application
+
+Subtype name:
+: cbor-diagnostic
+
+Required parameters:
+: N/A
+
+Optional parameters:
+: N/A
+
+Encoding considerations:
+: binary (UTF-8)
+
+Security considerations:
+: {{seccons}} of RFC XXXX
+
+Interoperability considerations:
+: none
+
+Published specification:
+: {{media-type}} of RFC XXXX
+
+Applications that use this media type:
+: Tools interchanging a human-readable form of CBOR
+
+Fragment identifier considerations:
+: The syntax and semantics of fragment identifiers is as specified for
+  "application/cbor".  (At publication of RFC XXXX, there is no
+  fragment identification syntax defined for "application/cbor".)
+
+Person & email address to contact for further information:
+: CBOR WG mailing list (cbor@ietf.org),
+  or IETF Applications and Real-Time Area (art@ietf.org)
+
+Intended usage:
+: COMMON
+
+Restrictions on usage:
+: none
+
+Author/Change controller:
+: IETF
+
+Provisional registration:
+: no
+
+## Content-Format
+
+IANA is requested to register a Content-Format number in the
+{{content-formats ("CoAP Content-Formats")<IANA.core-parameters}}
+sub-registry, within the "Constrained RESTful Environments (CoRE)
+Parameters" Registry {{IANA.core-parameters}}, as follows:
+
+| Content-Type                | Content Coding | ID   | Reference |
+| application/cbor-diagnostic | -              | TBD1 | RFC XXXX  |
+{: align="left" title="New Content-Format"}
+
+TBD1 is to be assigned from the space 256..999.
+
+
+Security considerations {#seccons}
 =======================
 
 The security considerations of {{-cbor}} and {{-cddl}} apply.
