@@ -249,6 +249,21 @@ Fragment identifier considerations:
   "application/cbor".  (At publication of RFC XXXX, there is no
   fragment identification syntax defined for "application/cbor".)
 
+Additional information:
+: \\
+
+  Deprecated alias names for this type:
+  : N/A
+
+  Magic number(s):
+  : N/A
+
+  File extension(s):
+  : .diag
+
+  Macintosh file type code(s):
+  : N/A
+
 Person & email address to contact for further information:
 : CBOR WG mailing list (cbor@ietf.org),
   or IETF Applications and Real-Time Area (art@ietf.org)
