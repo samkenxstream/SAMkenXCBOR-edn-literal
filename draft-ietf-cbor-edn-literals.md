@@ -28,7 +28,7 @@ author:
 
 venue:
   mail: cbor@ietf.org
-  github: cabo/edn-literal
+  github: cbor-wg/edn-literal
 
 normative:
   RFC8610: cddl
