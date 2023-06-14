@@ -1,3 +1,4 @@
+*.xml
 *.html
 *.pdf
 *.redxml
@@ -10,7 +11,7 @@
 .targets.mk
 /*-[0-9][0-9].xml
 archive.json
-draft-bormann-cbor-edn-literals.xml
+draft-ietf-cbor-edn-literals.xml
 lib
 report.xml
 venv/
