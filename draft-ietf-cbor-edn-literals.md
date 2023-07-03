@@ -57,6 +57,13 @@ The Concise Binary Object Representation, CBOR (RFC 8949), [^abs1-]
 
 ​[^abs3-] (draft-ietf-core-coral, draft-ietf-core-href).
 
+[^abs4-]: To facilitate tool interoperation, this document also
+     specifies a formal ABNF grammar for extended diagnostic notation (EDN)
+     that accommodates application-oriented literals.
+
+[^abs4-]
+
+
 --- middle
 
 Introduction        {#intro}
@@ -74,6 +81,8 @@ for representing CBOR constructs such as binary data and tags.
     a shared diagnostic notation in tools for and documents about CBOR.)
 
 [^abs3-] {{-coral}} {{-cri}}.
+
+[^abs4-] (See {{grammar}} as well as the ABNF snippets given for the extensions).
 
 [^cri-later]
 
@@ -141,14 +150,20 @@ variant available and make non-surprising choices otherwise.
 
 As an example, the CBOR diagnostic notation
 
-~~~ CBORdiag
+~~~ cbor-diag
 cri'https://example.com/bottarga/shaved'
 ~~~
 
 is equivalent to
 
-~~~ CBORdiag
+~~~ cbor-diag
 [-4, ["example", "com"], ["bottarga", "shaved"]]
+~~~
+
+TBD: ABNF (see also {{grammar}})
+
+~~~ abnf
+app-string-cri = ...
 ~~~
 
 
@@ -171,14 +186,20 @@ floating-point number; the value is an integer number otherwise.
 
 As an example, the CBOR diagnostic notation
 
-~~~ CBORdiag
+~~~ cbor-diag
 dt'1969-07-21T02:56:16Z'
 ~~~
 
 is equivalent to
 
-~~~ CBORdiag
+~~~ cbor-diag
 -14159024
+~~~
+
+TBD: ABNF (see also {{grammar}})
+
+~~~ abnf
+app-string-dt = ...
 ~~~
 
 
@@ -305,6 +326,24 @@ The security considerations of {{-cbor}} and {{-cddl}} apply.
 [^todo2]: Anything else meaningful to say here?
 
 --- back
+
+ABNF Grammar {#grammar}
+============
+
+This appendix defines an ABNF grammar for CBOR extended diagnostic
+notation.
+
+To complete the parsing of an `app-string` with prefix, say, `p`, the
+processed `sqstr` inside it is further parsed by the grammar specified
+for the production `app-string-p`.
+
+For simplicity, the internal parsing for the built-in EDN prefixes `h''` and
+`b64''` is specified in the same way.
+
+~~~ abnf
+{::include cbor-diag-parser.abnf}
+~~~
+{: #abnf-grammar sourcecode-name="cbor-edn.abnf"}
 
 Acknowledgements
 ================
