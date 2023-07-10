@@ -84,7 +84,7 @@ DIGIT1          = %x31-39 ; 1-9
 ODIGIT          = %x30-37 ; 0-7
 BDIGIT          = %x30-31 ; 0-1
 HEXDIG          = DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
-; Note: double-quoted letters as in "A" are case-insensitive in ABNF
+; Note: double-quoted strings as in "A" are case-insensitive in ABNF
 lcalpha         = %x61-7A ; a-z
 lcalnum         = lcalpha / DIGIT
 ALPHA           = %x41-5A / lcalpha   ; A-Z / a-z
