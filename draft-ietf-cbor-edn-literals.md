@@ -5,7 +5,7 @@ title: >
   Application-Oriented Literals in CBOR Extended Diagnostic Notation
 abbrev: CBOR EDN Literals
 docname: draft-ietf-cbor-edn-literals-latest
-date: 2023-06-14
+date: 2023-07-10
 
 keyword: Internet-Draft
 cat: info
@@ -38,9 +38,9 @@ normative:
   RFC3339: datetime
   RFC3986: uri
   RFC3987: iri
+  RFC9165: controls
 informative:
   RFC4648: base
-  I-D.ietf-core-coral: coral
   IANA.core-parameters:
 
 --- abstract
@@ -52,13 +52,13 @@ The Concise Binary Object Representation, CBOR (RFC 8949), [^abs1-]
     binary data.
 
 [^abs3-]: This document specifies how to add application-oriented extensions to
-    the diagnostic notation.  It then defines two such extensions for the use of
-    CBOR diagnostic notation with CoRAL and Constrained Resource Identifiers
+    the diagnostic notation.  It then defines two such extensions for
+    text representations of epoch-based date/times and of Constrained Resource Identifiers
 
-​[^abs3-] (draft-ietf-core-coral, draft-ietf-core-href).
+​[^abs3-] (draft-ietf-core-href).
 
 [^abs4-]: To facilitate tool interoperation, this document also
-     specifies a formal ABNF grammar for extended diagnostic notation (EDN)
+     specifies a formal ABNF definition for extended diagnostic notation (EDN)
      that accommodates application-oriented literals.
 
 [^abs4-]
@@ -80,13 +80,15 @@ for representing CBOR constructs such as binary data and tags.
     not serve to create another interchange format, but enables the use of
     a shared diagnostic notation in tools for and documents about CBOR.)
 
-[^abs3-] {{-coral}} {{-cri}}.
+[^abs3-] {{-cri}}.
 
-[^abs4-] (See {{grammar}} as well as the ABNF snippets given for the extensions).
+[^abs4-] (See {{grammar}} for an overall ABNF grammar as well as the
+ABNF definitions in {{app-grammars}} for grammars for both the
+byte string presentations predefined in {{-cbor}} and the application-extensions).
 
 [^cri-later]
 
-[^cri-later]: Note that the {{cri}} about CRIs may move to the {{-cri}}
+[^cri-later]: Note that {{cri}} and {{cri-grammar}} about CRIs may move to the {{-cri}}
     specification, depending on the relative speed of approval; the
     later document gets the section.
 
@@ -160,11 +162,7 @@ is equivalent to
 [-4, ["example", "com"], ["bottarga", "shaved"]]
 ~~~
 
-TBD: ABNF (see also {{grammar}})
-
-~~~ abnf
-app-string-cri = ...
-~~~
+See {{cri-grammar}} for an ABNF definition for the content of CRI literals.
 
 
 The "dt" Extension {#dt}
@@ -181,7 +179,7 @@ The value of the literal is a number representing the result of a
 conversion of the given Standard Date/Time String to an Epoch-Based
 Date/Time.
 If fractional seconds are given in the text (production
-`time-fraction` in {{Section A of -datetime}}), the value is a
+`time-secfrac` in {{abnf-grammar-dt}}), the value is a
 floating-point number; the value is an integer number otherwise.
 
 As an example, the CBOR diagnostic notation
@@ -196,12 +194,7 @@ is equivalent to
 -14159024
 ~~~
 
-TBD: ABNF (see also {{grammar}})
-
-~~~ abnf
-app-string-dt = ...
-~~~
-
+See {{dt-grammar}} for an ABNF definition for the content of DT literals.
 
 IANA Considerations {#sec-iana}
 ===================
@@ -327,23 +320,209 @@ The security considerations of {{-cbor}} and {{-cddl}} apply.
 
 --- back
 
-ABNF Grammar {#grammar}
-============
+ABNF Definitions {#grammars}
+================
 
-This appendix defines an ABNF grammar for CBOR extended diagnostic
-notation.
+Overall ABNF Definition for Extended Diagnostic Notation {#grammar}
+--------------------------------------------------------
+
+This appendix provides an overall ABNF definition for the syntax of
+CBOR extended diagnostic notation.
 
 To complete the parsing of an `app-string` with prefix, say, `p`, the
-processed `sqstr` inside it is further parsed by the grammar specified
-for the production `app-string-p`.
+processed `sqstr` inside it is further parsed using the ABNF definition specified
+for the production `app-string-p` in {{app-grammars}}.
 
-For simplicity, the internal parsing for the built-in EDN prefixes `h''` and
-`b64''` is specified in the same way.
+For simplicity, the internal parsing for the built-in EDN prefixes is
+specified in the same way.
+ABNF definitions for `h''` and `b64''` are provided in {{h-grammar}} and
+{{b64-grammar}}.
+However, the prefixes `b32''` and `h32''` are not in wide use and an
+ABNF definition in this document could therefore not be based on
+implementation experience.
 
 ~~~ abnf
 {::include cbor-diag-parser.abnf}
 ~~~
-{: #abnf-grammar sourcecode-name="cbor-edn.abnf"}
+{: #abnf-grammar "ABNF Definition of CBOR EDN" sourcecode-name="cbor-edn.abnf"}
+
+ABNF Definitions for app-string Content {#app-grammars}
+---------------------------------------
+
+This appendix provides ABNF definitions for application-oriented extension
+literals defined in {{-cbor}} and in this specification.
+These grammars describe the decoded content of the `sqstr` components that
+combine with the application-extension identifiers to form
+application-oriented extension literals.
+Each of these may make use of rules defined in {{abnf-grammar}}.
+
+### h: ABNF Definition of Hexadecimal representation of a byte string {#h-grammar}
+
+
+The syntax of the content of byte strings represented in hex,
+such as `h''`, `h'0815`, or `h'/head/ 63 /contents/ 66 6f 6f'`
+(another representation of `<< "foo" >>), is described by the ABNF in {{abnf-grammar-h}}.
+This syntax accommodates both lower case and upper case hex digits, as
+well as blank space (including comments) around each hex digit.
+
+~~~ abnf
+app-string-h    = S *(HEXDIG S HEXDIG S)
+~~~
+{: #abnf-grammar-h sourcecode-name="cbor-edn-h.abnf"
+title="ABNF Definition of Hexadecimal Representation of a Byte String"
+}
+
+
+### b64: ABNF Definition of Base64 representation of a byte string {#b64-grammar}
+
+
+The syntax of the content of byte strings represented in base64 is
+described by the ABNF in {{abnf-grammar-h}}.
+
+This syntax allows both the classic {{Section 4 of RFC4648}} and the
+URL-safe {{Section 5 of RFC4648}} alphabet to be used.
+It accommodates, but does not require base64 padding.
+Note that inclusion of classic base64 makes it impossible to have
+comments in b64, as "/" is valid base64-classic.
+
+~~~ abnf
+app-string-b64  = B *(4(b64dig B))
+                  [b64dig B b64dig B ["==" / b64dig B ["="]] B]
+b64dig          = ALPHA / DIGIT / "-" / "_" / "+" / "/"
+B               = *iblank
+iblank          = %x0A / %x20  ; Not HT or CR (gone)
+~~~
+{: #abnf-grammar-b64 sourcecode-name="cbor-edn-b64.abnf"
+title="ABNF definition of Base64 Representation of a Byte String"
+}
+
+### dt: ABNF Definition of RFC 3339 Representation of a Date/Time {#dt-grammar}
+
+The syntax of the content of `dt` literals can be described by the
+ABNF for `date-time` from {{RFC3339}} as summarized in {{Section 3 of -controls}}:
+
+~~~ abnf
+app-string-dt   = date-time
+
+date-fullyear   = 4DIGIT
+date-month      = 2DIGIT  ; 01-12
+date-mday       = 2DIGIT  ; 01-28, 01-29, 01-30, 01-31 based on
+                          ; month/year
+time-hour       = 2DIGIT  ; 00-23
+time-minute     = 2DIGIT  ; 00-59
+time-second     = 2DIGIT  ; 00-58, 00-59, 00-60 based on leap sec
+                          ; rules
+time-secfrac    = "." 1*DIGIT
+time-numoffset  = ("+" / "-") time-hour ":" time-minute
+time-offset     = "Z" / time-numoffset
+
+partial-time    = time-hour ":" time-minute ":" time-second
+                  [time-secfrac]
+full-date       = date-fullyear "-" date-month "-" date-mday
+full-time       = partial-time time-offset
+
+date-time       = full-date "T" full-time
+DIGIT           =  %x30-39 ; 0-9
+~~~
+{: #abnf-grammar-dt sourcecode-name="cbor-edn-dt.abnf"
+title="ABNF Definition of RFC3339 Representation of a Date/Time"
+}
+
+
+### cri: ABNF Definition of URI Representation of a CRI {#cri-grammar}
+
+The syntax of the content of `cri` literals can be described by the
+ABNF for `URI-reference` in {{Section 4.1 of -uri}}:
+
+~~~ abnf
+app-string-cri = URI-reference
+; ABNF from RFC 3986:
+
+URI           = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
+
+hier-part     = "//" authority path-abempty
+                 / path-absolute
+                 / path-rootless
+                 / path-empty
+
+URI-reference = URI / relative-ref
+
+absolute-URI  = scheme ":" hier-part [ "?" query ]
+
+relative-ref  = relative-part [ "?" query ] [ "#" fragment ]
+
+relative-part = "//" authority path-abempty
+                 / path-absolute
+                 / path-noscheme
+                 / path-empty
+
+scheme        = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+
+authority     = [ userinfo "@" ] host [ ":" port ]
+userinfo      = *( unreserved / pct-encoded / sub-delims / ":" )
+host          = IP-literal / IPv4address / reg-name
+port          = *DIGIT
+
+IP-literal    = "[" ( IPv6address / IPvFuture  ) "]"
+
+IPvFuture     = "v" 1*HEXDIG "." 1*( unreserved / sub-delims / ":" )
+
+IPv6address   =                            6( h16 ":" ) ls32
+                 /                       "::" 5( h16 ":" ) ls32
+                 / [               h16 ] "::" 4( h16 ":" ) ls32
+                 / [ *1( h16 ":" ) h16 ] "::" 3( h16 ":" ) ls32
+                 / [ *2( h16 ":" ) h16 ] "::" 2( h16 ":" ) ls32
+                 / [ *3( h16 ":" ) h16 ] "::"    h16 ":"   ls32
+                 / [ *4( h16 ":" ) h16 ] "::"              ls32
+                 / [ *5( h16 ":" ) h16 ] "::"              h16
+                 / [ *6( h16 ":" ) h16 ] "::"
+
+h16           = 1*4HEXDIG
+ls32          = ( h16 ":" h16 ) / IPv4address
+IPv4address   = dec-octet "." dec-octet "." dec-octet "." dec-octet
+dec-octet     = DIGIT                 ; 0-9
+                 / %x31-39 DIGIT         ; 10-99
+                 / "1" 2DIGIT            ; 100-199
+                 / "2" %x30-34 DIGIT     ; 200-249
+                 / "25" %x30-35          ; 250-255
+
+reg-name      = *( unreserved / pct-encoded / sub-delims )
+
+path          = path-abempty    ; begins with "/" or is empty
+                 / path-absolute   ; begins with "/" but not "//"
+                 / path-noscheme   ; begins with a non-colon segment
+                 / path-rootless   ; begins with a segment
+                 / path-empty      ; zero characters
+
+path-abempty  = *( "/" segment )
+path-absolute = "/" [ segment-nz *( "/" segment ) ]
+path-noscheme = segment-nz-nc *( "/" segment )
+path-rootless = segment-nz *( "/" segment )
+path-empty    = 0<pchar>
+
+segment       = *pchar
+segment-nz    = 1*pchar
+segment-nz-nc = 1*( unreserved / pct-encoded / sub-delims / "@" )
+                 ; non-zero-length segment without any colon ":"
+
+pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
+
+query         = *( pchar / "/" / "?" )
+
+fragment      = *( pchar / "/" / "?" )
+
+pct-encoded   = "%" HEXDIG HEXDIG
+
+unreserved    = ALPHA / DIGIT / "-" / "." / "_" / "~"
+reserved      = gen-delims / sub-delims
+gen-delims    = ":" / "/" / "?" / "#" / "[" / "]" / "@"
+sub-delims    = "!" / "$" / "&" / "'" / "(" / ")"
+                 / "*" / "+" / "," / ";" / "="
+~~~
+{: #abnf-grammar-cri sourcecode-name="cbor-edn-cri.abnf"
+title="ABNF Definition of URI Representation of a CRI"
+}
+
 
 Acknowledgements
 ================

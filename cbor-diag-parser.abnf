@@ -88,15 +88,3 @@ HEXDIG          = DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
 lcalpha         = %x61-7A ; a-z
 lcalnum         = lcalpha / DIGIT
 ALPHA           = %x41-5A / lcalpha   ; A-Z / a-z
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Internal syntax of app-string (after decoding sqstr):
-
-app-string-h    = S *(HEXDIG S HEXDIG S)
-
-; note we can't have comments in b64, as "/" is valid base64-classic
-app-string-b64  = B *(4(b64dig B))
-                  [b64dig B b64dig B ["==" / b64dig B ["="]] B]
-b64dig          = ALPHA / DIGIT / "-" / "_" / "+" / "/"
-B               = *iblank
-iblank          = %x0A / %x20  ; Not HT or CR (gone)
